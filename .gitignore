@@ -1,0 +1,5 @@
+node_modules
+.env
+hackathons.db
+server.log
+.DS_Store

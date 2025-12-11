@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hackathon Tracker</h1>
+            <button id="toggleFormBtn" class="btn-primary">+ Add New</button>
+        </header>
+
+        <div id="addForm" class="form-container hidden">
+            <div class="url-extractor">
+                <input type="url" id="urlInput" placeholder="Paste Hackathon URL to auto-fill">
+                <button id="fetchBtn" class="btn-secondary">Auto-fill</button>
+            </div>
+            <div id="loading" class="hidden">Extracting data...</div>
+
+            <form id="hackathonForm">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>URL</label>
+                    <input type="url" id="link" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="text" id="deadline" placeholder="YYYY-MM-DD">
+                    </div>
+                    <div class="form-group">
+                        <label>Prize Pool</label>
+                        <input type="text" id="prize_pool" placeholder="e.g. $10,000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Difficulty</label>
+                        <select id="difficulty">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                            <option value="Hardcore">Hardcore</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Confidence (1-5)</label>
+                        <input type="range" id="confidence" min="1" max="5" value="3" oninput="this.nextElementSibling.value = this.value">
+                        <output>3</output>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Notes / Description</label>
+                    <textarea id="description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Rules</label>
+                    <textarea id="rules" rows="3" placeholder="Extracted rules..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Hashtag Counter</label>
+                    <input type="text" id="hashtag_counts" placeholder="#hashtag: 100+ videos" readonly>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="joined">
+                    <label for="joined">I have joined this hackathon</label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn-text">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Hackathon</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="hackathonList" class="grid-container">
+            <!-- Cards will be injected here -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
