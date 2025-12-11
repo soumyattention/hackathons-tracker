@@ -7,11 +7,23 @@ const puppeteer = require('puppeteer');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 
 const app = express();
 const genAI = new GoogleGenerativeAI("AIzaSyAI8XyPZiLqn0C1SleP9PsnFxmOBFzoXm4");
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 const PORT = 3000;
+
+// Configure Multer
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/uploads/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage: storage });
 
 // Middleware
 app.use(cors());
@@ -42,11 +54,13 @@ function createTable() {
         notes TEXT,
         rules TEXT,
         hashtag_counts TEXT,
+        logo TEXT,
+        prizes TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`, (err) => {
         if (!err) {
             // Attempt to add new columns if they don't exist (migrations)
-            const cols = ['rules', 'hashtag_counts'];
+            const cols = ['rules', 'hashtag_counts', 'logo', 'prizes'];
             cols.forEach(col => {
                 db.run(`ALTER TABLE hackathons ADD COLUMN ${col} TEXT`, () => {});
             });
@@ -69,10 +83,12 @@ app.get('/api/hackathons', (req, res) => {
 });
 
 // Add a hackathon
-app.post('/api/hackathons', (req, res) => {
-    const { title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, hashtag_counts } = req.body;
-    const sql = `INSERT INTO hackathons (title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, hashtag_counts) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
-    const params = [title, url, description, deadline, prize_pool, difficulty, confidence, joined ? 1 : 0, notes, rules, hashtag_counts];
+app.post('/api/hackathons', upload.single('logo'), (req, res) => {
+    const { title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, prizes } = req.body;
+    const logo = req.file ? `/uploads/${req.file.filename}` : '';
+    
+    const sql = `INSERT INTO hackathons (title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, prizes, logo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const params = [title, url, description, deadline, prize_pool, difficulty, confidence, joined ? 1 : 0, notes, rules, prizes, logo];
     
     db.run(sql, params, function (err) {
         if (err) {
@@ -81,16 +97,24 @@ app.post('/api/hackathons', (req, res) => {
         }
         res.json({ 
             message: 'success', 
-            data: { id: this.lastID, ...req.body } 
+            data: { id: this.lastID, ...req.body, logo } 
         });
     });
 });
 
 // Update a hackathon
-app.put('/api/hackathons/:id', (req, res) => {
-    const { title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, hashtag_counts } = req.body;
-    const sql = `UPDATE hackathons SET title = ?, url = ?, description = ?, deadline = ?, prize_pool = ?, difficulty = ?, confidence = ?, joined = ?, notes = ?, rules = ?, hashtag_counts = ? WHERE id = ?`;
-    const params = [title, url, description, deadline, prize_pool, difficulty, confidence, joined ? 1 : 0, notes, rules, hashtag_counts, req.params.id];
+app.put('/api/hackathons/:id', upload.single('logo'), (req, res) => {
+    const { title, url, description, deadline, prize_pool, difficulty, confidence, joined, notes, rules, prizes } = req.body;
+    let logo = req.file ? `/uploads/${req.file.filename}` : undefined;
+    
+    let sql, params;
+    if (logo) {
+        sql = `UPDATE hackathons SET title = ?, url = ?, description = ?, deadline = ?, prize_pool = ?, difficulty = ?, confidence = ?, joined = ?, notes = ?, rules = ?, prizes = ?, logo = ? WHERE id = ?`;
+        params = [title, url, description, deadline, prize_pool, difficulty, confidence, joined ? 1 : 0, notes, rules, prizes, logo, req.params.id];
+    } else {
+        sql = `UPDATE hackathons SET title = ?, url = ?, description = ?, deadline = ?, prize_pool = ?, difficulty = ?, confidence = ?, joined = ?, notes = ?, rules = ?, prizes = ? WHERE id = ?`;
+        params = [title, url, description, deadline, prize_pool, difficulty, confidence, joined ? 1 : 0, notes, rules, prizes, req.params.id];
+    }
     
     db.run(sql, params, function (err) {
         if (err) {
@@ -145,14 +169,10 @@ app.post('/api/scrape', async (req, res) => {
         const extracted = await page.evaluate(() => {
             const getMeta = (prop) => document.querySelector(`meta[property="${prop}"]`)?.content || document.querySelector(`meta[name="${prop}"]`)?.content || '';
             
-            // Count videos (approximation for Twitter/X)
-            const videoCount = document.querySelectorAll('video, [data-testid="videoComponent"]').length;
-
             return {
                 title: getMeta('og:title') || document.title || '',
                 url: window.location.href,
-                full_text: document.body.innerText.substring(0, 30000), // Limit text for AI
-                video_count: videoCount
+                full_text: document.body.innerText.substring(0, 30000)
             };
         });
 
@@ -161,18 +181,19 @@ app.post('/api/scrape', async (req, res) => {
             const prompt = `Analyze the following text from a hackathon or event page.
             
             Requirements:
-            1. description: Precise, compact summary (Max 3 sentences).
-            2. rules: Compact list of key rules (e.g., "Team size 1-4, No prior code").
-            3. hashtags: If the text mentions posting on social media with a specific hashtag, extract it (e.g., ["#hackathon2025"]). If none, return [].
+            1. description: ULTRA-COMPACT summary. Max 1-2 short sentences. Focus on the core goal only.
+            2. rules: Compact list of key constraints.
+            3. prizes: Detailed list of rewards/prizes (e.g. "1st: $5k, 2nd: $2k").
+            4. prize_pool: Total pool amount (e.g. "$50,000").
             
             Return ONLY a valid JSON object (no markdown) with these keys:
             - title: string
             - description: string
             - deadline: string
             - prize_pool: string
+            - prizes: string (breakdown)
             - difficulty: string (Beginner/Intermediate/Advanced/Hardcore)
             - rules: string (formatted text)
-            - hashtags: array of strings
             
             Text:
             ${extracted.full_text.substring(0, 30000)}`;
@@ -185,44 +206,12 @@ app.post('/api/scrape', async (req, res) => {
             text = text.replace(/```json/g, '').replace(/```/g, '').trim();
             const aiData = JSON.parse(text);
 
-            // Check Twitter for hashtags
-            let hashtagCountsStr = '';
-            if (aiData.hashtags && aiData.hashtags.length > 0) {
-                const counts = [];
-                for (const tag of aiData.hashtags) {
-                    try {
-                        const searchUrl = `https://x.com/search?q=${encodeURIComponent(tag)}&src=typed_query&f=media`;
-                        await page.goto(searchUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-                        
-                        // Scroll and count videos
-                        let videoCount = 0;
-                        let scrolls = 0;
-                        while (videoCount < 100 && scrolls < 10) {
-                            const newVideos = await page.evaluate(() => document.querySelectorAll('video, [data-testid="videoComponent"]').length);
-                            videoCount = newVideos;
-                            if (videoCount >= 100) break;
-                            
-                            await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
-                            await new Promise(r => setTimeout(r, 1500));
-                            scrolls++;
-                        }
-                        
-                        const countStr = videoCount >= 100 ? '100+' : videoCount.toString();
-                        counts.push(`${tag}: ${countStr} videos`);
-                    } catch (e) {
-                        console.error(`Error checking hashtag ${tag}:`, e.message);
-                        counts.push(`${tag}: Check failed`);
-                    }
-                }
-                hashtagCountsStr = counts.join(', ');
-            }
-
             const finalData = {
                 ...extracted,
                 ...aiData,
                 title: aiData.title || extracted.title,
                 rules: aiData.rules || '',
-                hashtag_counts: hashtagCountsStr
+                prizes: aiData.prizes || ''
             };
 
             res.json({ data: finalData });

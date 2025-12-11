@@ -3,3 +3,4 @@ node_modules
 hackathons.db
 server.log
 .DS_Store
+.vercel

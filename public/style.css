@@ -1,67 +1,82 @@
 :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-primary: #ffffff;
-    --text-secondary: #aaaaaa;
-    --accent: #6200ea;
-    --accent-hover: #3700b3;
-    --danger: #cf6679;
-    --success: #03dac6;
-    --border: #333;
+    --bg-color: #f5f5f7;
+    --card-bg: #ffffff;
+    --text-primary: #1d1d1f;
+    --text-secondary: #86868b;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --danger: #ff3b30;
+    --success: #34c759;
+    --border: #d2d2d7;
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --radius: 18px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font);
     background-color: var(--bg-color);
     color: var(--text-primary);
     margin: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 20px;
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
     padding-bottom: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 h1 {
     font-weight: 600;
-    font-size: 24px;
+    font-size: 32px;
     margin: 0;
+    letter-spacing: -0.02em;
 }
 
 .btn-primary {
     background-color: var(--accent);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 999px;
     cursor: pointer;
     font-weight: 500;
-    transition: background 0.2s;
+    font-size: 14px;
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 113, 227, 0.2);
 }
 
 .btn-primary:hover {
     background-color: var(--accent-hover);
+    transform: scale(1.02);
 }
 
 .btn-secondary {
-    background-color: var(--border);
-    color: white;
+    background-color: #e5e5ea;
+    color: var(--text-primary);
     border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
+    padding: 10px 20px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #d1d1d6;
 }
 
 .btn-text {
@@ -69,19 +84,22 @@ h1 {
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    margin-right: 10px;
+    margin-right: 15px;
+    font-size: 14px;
 }
 
 .btn-text:hover {
     color: var(--text-primary);
 }
 
+/* Form Styles */
 .form-container {
     background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: var(--radius);
+    margin-bottom: 40px;
+    box-shadow: var(--shadow);
+    animation: fadeSlideDown 0.3s ease-out;
 }
 
 .hidden {
@@ -90,23 +108,25 @@ h1 {
 
 .url-extractor {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
+    gap: 15px;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .url-extractor input {
     flex-grow: 1;
+    background: #f5f5f7;
+    border: none;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form-row {
     display: flex;
-    gap: 15px;
+    gap: 20px;
 }
 
 .form-row .form-group {
@@ -115,170 +135,325 @@ h1 {
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
 }
 
 input, select, textarea {
     width: 100%;
-    background-color: #2c2c2c;
-    border: 1px solid var(--border);
+    background-color: #fff;
+    border: 1px solid #d2d2d7;
     color: var(--text-primary);
-    padding: 10px;
-    border-radius: 6px;
+    padding: 12px 15px;
+    border-radius: 12px;
     box-sizing: border-box;
     font-family: inherit;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
 }
 
-.checkbox-group {
+/* Drag & Drop */
+.dropzone {
+    border: 2px dashed #d2d2d7;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: #fafafa;
+}
+
+.dropzone:hover, .dropzone.dragover {
+    border-color: var(--accent);
+    background: #f0f8ff;
+}
+
+.dropzone img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #e5e5ea;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+input:checked + .slider {
+  background-color: var(--success);
+}
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+.toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+.toggle-container {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
+    margin-top: 5px;
+}
+.status-text {
+    font-weight: 600;
+    font-size: 14px;
+    min-width: 80px;
+    color: var(--text-primary);
 }
 
-.checkbox-group input {
-    width: auto;
-}
-
-.checkbox-group label {
-    margin: 0;
-}
-
+/* Bento Grid */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 25px;
+}
+
+@media (max-width: 900px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
 }
 
 .hackathon-card {
     background-color: var(--card-bg);
-    border-radius: 10px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    transition: transform 0.2s, border-color 0.2s;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
     position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.03);
 }
 
 .hackathon-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
-.hackathon-card.joined {
-    border-left: 4px solid var(--success);
-}
-
-.card-header {
+.card-top {
     display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 10px;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.card-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: #f5f5f7;
+    flex-shrink: 0;
+}
+
+.card-header-content {
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .card-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px;
+    font-weight: 700;
     color: var(--text-primary);
     text-decoration: none;
-    margin-right: 10px;
+    display: block;
+    margin-bottom: 8px;
+    line-height: 1.3;
 }
 
 .card-title:hover {
-    text-decoration: underline;
+    color: var(--accent);
 }
 
-.card-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 10px;
-}
-
-.badge {
+.status-badge {
+    display: inline-block;
     font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 4px;
-    background-color: #333;
-    color: #ccc;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
 
-.badge.prize {
-    background-color: rgba(98, 0, 234, 0.2);
-    color: #b388ff;
+.status-joined {
+    background-color: rgba(52, 199, 89, 0.15);
+    color: var(--success);
 }
 
-.badge.deadline {
-    background-color: rgba(207, 102, 121, 0.2);
-    color: #ff8a80;
+.bento-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
 }
 
-.card-meta {
+.bento-box {
+    background: #fbfbfd;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* Light Radial Gradients */
+.bg-gradient-red {
+    background: radial-gradient(circle at top left, rgba(255, 59, 48, 0.1), rgba(255, 255, 255, 0));
+    background-color: #fff5f5;
+}
+
+.bg-gradient-green {
+    background: radial-gradient(circle at bottom left, rgba(52, 199, 89, 0.1), rgba(255, 255, 255, 0));
+    background-color: #f2fff5;
+}
+
+.bg-gradient-blue {
+    background: radial-gradient(circle at top right, rgba(0, 113, 227, 0.1), rgba(255, 255, 255, 0));
+    background-color: #f0f8ff;
+}
+
+.bg-gradient-orange {
+    background: radial-gradient(circle at bottom right, rgba(255, 149, 0, 0.1), rgba(255, 255, 255, 0));
+    background-color: #fff8f0;
+}
+
+.bento-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    opacity: 0.8;
+}
+
+.bento-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.bento-sub {
     font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: space-between;
+    margin-top: 4px;
+    font-weight: 500;
 }
 
-.card-desc {
-    font-size: 13px;
-    color: #ccc;
-    line-height: 1.5;
-    margin-bottom: 15px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.card-summary {
+    font-size: 15px;
+    color: #4a4a4f;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
 .card-actions {
+    margin-top: auto;
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: auto;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.hackathon-card:hover .card-actions {
+    opacity: 1;
 }
 
 .icon-btn {
-    background: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     border: none;
+    background: #f5f5f7;
     cursor: pointer;
-    font-size: 14px;
-    color: var(--text-secondary);
-    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background 0.2s;
 }
 
 .icon-btn:hover {
-    color: var(--text-primary);
+    background: #e5e5ea;
 }
 
 .icon-btn.delete:hover {
+    background: #ffe5e5;
     color: var(--danger);
 }
 
 #loading {
     color: var(--accent);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-align: center;
-    font-size: 13px;
-    animation: pulse 1s infinite;
+    font-size: 14px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse {
-    0% { opacity: 0.5; }
+    0% { opacity: 0.6; }
     50% { opacity: 1; }
-    100% { opacity: 0.5; }
+    100% { opacity: 0.6; }
 }
 
 @media (max-width: 600px) {
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
+    .container { padding: 20px; }
+    .form-row { flex-direction: column; gap: 15px; }
+    .card-actions { opacity: 1; }
 }

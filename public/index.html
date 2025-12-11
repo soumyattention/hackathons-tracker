@@ -25,6 +25,15 @@
                 <input type="hidden" id="editId">
                 
                 <div class="form-group">
+                    <label>Logo (Drag & Drop or Click)</label>
+                    <div id="dropzone" class="dropzone">
+                        <p>Drop image here or click to upload (100x100px preferred)</p>
+                        <input type="file" id="logoInput" accept="image/*" class="hidden">
+                        <img id="logoPreview" class="hidden" alt="Logo Preview">
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>Title</label>
                     <input type="text" id="title" required>
                 </div>
@@ -63,8 +72,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Notes / Description</label>
-                    <textarea id="description" rows="3"></textarea>
+                    <label>AI Summary</label>
+                    <textarea id="description" rows="2" placeholder="Auto-generated summary..."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -73,13 +82,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Hashtag Counter</label>
-                    <input type="text" id="hashtag_counts" placeholder="#hashtag: 100+ videos" readonly>
+                    <label>Detailed Rewards</label>
+                    <textarea id="prizes" rows="3" placeholder="1st place: $5k, etc..."></textarea>
                 </div>
 
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="joined">
-                    <label for="joined">I have joined this hackathon</label>
+                <div class="form-group">
+                    <label>Personal Notes</label>
+                    <textarea id="notes" rows="3" placeholder="My team, ideas, progress..."></textarea>
+                </div>
+
+                <div class="form-group toggle-wrapper">
+                    <label>Joined Status</label>
+                    <div class="toggle-container">
+                        <label class="switch">
+                            <input type="checkbox" id="joined" onchange="document.getElementById('joined-status').innerText = this.checked ? 'Joined' : 'Not Joined'">
+                            <span class="slider round"></span>
+                        </label>
+                        <span id="joined-status" class="status-text">Not Joined</span>
+                    </div>
                 </div>
 
                 <div class="form-actions">
